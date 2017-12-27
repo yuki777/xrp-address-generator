@@ -6,8 +6,8 @@ var qr       = require('qrious');
 var secret    = keypairs.generateSeed();
 var keypair   = keypairs.deriveKeypair(secret);
 var address   = keypairs.deriveAddress(keypair.publicKey);
-var addressQr = new qr({value: address});
-var secretQr  = new qr({value: secret});
+var addressQr = new qr({padding: 10, size: 200, value: address });
+var secretQr  = new qr({padding: 10, size: 200, value: secret  });
 
 document.querySelector('#address').textContent = address;
 document.querySelector('#secret').textContent = secret;
