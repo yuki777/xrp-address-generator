@@ -11,7 +11,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "browserify src/main.js > build/bundle.js"
+    "build": "browserify main.js > bundle.js"
   },
   "author": "Yuki Adachi",
   "license": "MIT"
