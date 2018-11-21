@@ -5,10 +5,10 @@
 
 # Install
 ```
-git clone https://github.com/yuki777/ripple-paper-wallet
-cd ripple-paper-wallet
-npm i
-npm run build
+mkdir -p ~/apps
+git clone https://github.com/yuki777/ripple-paper-wallet ~/apps/ripple-paper-wallet
+cd ~/apps/ripple-paper-wallet
+yarn install
 
 # => Open/Reload index.html
 ```
