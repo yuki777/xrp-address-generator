@@ -11,12 +11,12 @@ cd ~/apps/ripple-paper-wallet
 yarn install
 ```
 
+# Create XRP Address via Browser
+```
+open index.html
+```
+
 # Create XRP Address via CLI
 ```
 node create.js
-```
-
-# Create XRP Address via Browser
-```
-# Open index.html
 ```
