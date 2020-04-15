@@ -4,8 +4,10 @@
   "description": "Ripple paper wallet generator",
   "main": "src/main.js",
   "dependencies": {
+    "acorn": "^6.4.1",
     "browserify": "^14.5.0",
     "cached-path-relative": ">=1.0.2",
+    "minimist": "^1.2.3",
     "qrious": "^4.0.2",
     "ripple-keypairs": "^0.10.1"
   },
