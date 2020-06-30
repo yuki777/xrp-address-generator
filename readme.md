@@ -8,7 +8,7 @@
 mkdir -p ~/apps
 git clone https://github.com/yuki777/ripple-paper-wallet ~/apps/ripple-paper-wallet
 cd ~/apps/ripple-paper-wallet
-yarn install
+npm install
 ```
 
 # Create XRP Address via Browser
