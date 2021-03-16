@@ -2,6 +2,10 @@
   "name": "xrp-paper-wallet",
   "version": "1.0.0",
   "description": "XRP paper wallet generator",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/yuki777/xrp-paper-wallet.git"
+  },
   "main": "src/main.js",
   "dependencies": {
     "acorn": "^6.4.1",
