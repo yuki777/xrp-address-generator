@@ -6,9 +6,8 @@
 # Install and Build
 ```
 # Install
-mkdir -p ~/apps
-git clone https://github.com/yuki777/xrp-paper-wallet ~/apps/xrp-paper-wallet
-cd ~/apps/xrp-paper-wallet
+git clone https://github.com/yuki777/xrp-paper-wallet xrp-paper-wallet
+cd xrp-paper-wallet
 npm install
 
 # Build
