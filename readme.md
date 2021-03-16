@@ -1,13 +1,13 @@
 # About
-- https://github.com/yuki777/ripple-paper-wallet
+- https://github.com/yuki777/xrp-paper-wallet
 - Ripple paper wallet generator.
 - Working offline.
 
 # Install
 ```
 mkdir -p ~/apps
-git clone https://github.com/yuki777/ripple-paper-wallet ~/apps/ripple-paper-wallet
-cd ~/apps/ripple-paper-wallet
+git clone https://github.com/yuki777/xrp-paper-wallet ~/apps/xrp-paper-wallet
+cd ~/apps/xrp-paper-wallet
 npm install
 ```
 
