@@ -12,6 +12,11 @@ npm install
 
 # Build
 npm run-script build
+
+# Disable internet access
+- Turn off the Wi-Fi.
+- Disconnect the Ethernet cable.
+
 ```
 
 # Create XRP Address via Browser
