@@ -21,10 +21,10 @@ npm run-script build
 
 # Create XRP Address via Browser
 ```
-open index.html
+open index.html # Don't forget to save it.
 ```
 
 # Create XRP Address via CLI
 ```
-node create.js
+node create.js # Don't forget to save it.
 ```
