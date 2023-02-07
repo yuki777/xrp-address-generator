@@ -18,7 +18,7 @@ document.querySelector('#addressQr').setAttribute('src', addressQr.toDataURL());
 document.querySelector('#xAddressQr').setAttribute('src', xAddressQr.toDataURL());
 document.querySelector('#secretQr').setAttribute('src', secretQr.toDataURL());
 
-},{"qrious":73,"ripple-address-codec":90,"ripple-keypairs":93}],2:[function(require,module,exports){
+},{"qrious":73,"ripple-address-codec":90,"ripple-keypairs":94}],2:[function(require,module,exports){
 (function (global){(function (){
 'use strict';
 
@@ -1219,8 +1219,6 @@ function base (ALPHABET) {
     if (typeof source !== 'string') { throw new TypeError('Expected String') }
     if (source.length === 0) { return _Buffer.alloc(0) }
     var psz = 0
-        // Skip leading spaces.
-    if (source[psz] === ' ') { return }
         // Skip and count leading '1's.
     var zeroes = 0
     var length = 0
@@ -1247,8 +1245,6 @@ function base (ALPHABET) {
       length = i
       psz++
     }
-        // Skip trailing spaces.
-    if (source[psz] === ' ') { return }
         // Skip leading zeroes in b256.
     var it4 = size - length
     while (it4 !== size && b256[it4] === 0) {
@@ -14456,21 +14452,27 @@ utils.intFromLE = intFromLE;
 
 },{"buffer":10}],31:[function(require,module,exports){
 module.exports={
-  "_from": "elliptic@>=6.5.4",
+  "_args": [
+    [
+      "elliptic@6.5.4",
+      "/Users/adachi/git/xrp-paper-wallet"
+    ]
+  ],
+  "_from": "elliptic@6.5.4",
   "_id": "elliptic@6.5.4",
   "_inBundle": false,
   "_integrity": "sha512-iLhC6ULemrljPZb+QutR5TQGB+pdW6KGD5RSegS+8sorOZT+rdQFbsQFJgvN3eRqNALqJer4oQ16YvJHlU8hzQ==",
   "_location": "/elliptic",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
+    "type": "version",
     "registry": true,
-    "raw": "elliptic@>=6.5.4",
+    "raw": "elliptic@6.5.4",
     "name": "elliptic",
     "escapedName": "elliptic",
-    "rawSpec": ">=6.5.4",
+    "rawSpec": "6.5.4",
     "saveSpec": null,
-    "fetchSpec": ">=6.5.4"
+    "fetchSpec": "6.5.4"
   },
   "_requiredBy": [
     "/",
@@ -14479,9 +14481,8 @@ module.exports={
     "/ripple-keypairs"
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.5.4.tgz",
-  "_shasum": "da37cebd31e79a1367e941b592ed1fbebd58abbb",
-  "_spec": "elliptic@>=6.5.4",
-  "_where": "/Users/yuki/git/xrp-paper-wallet",
+  "_spec": "6.5.4",
+  "_where": "/Users/adachi/git/xrp-paper-wallet",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -14489,7 +14490,6 @@ module.exports={
   "bugs": {
     "url": "https://github.com/indutny/elliptic/issues"
   },
-  "bundleDependencies": false,
   "dependencies": {
     "bn.js": "^4.11.9",
     "brorand": "^1.1.0",
@@ -14499,7 +14499,6 @@ module.exports={
     "minimalistic-assert": "^1.0.1",
     "minimalistic-crypto-utils": "^1.0.1"
   },
-  "deprecated": false,
   "description": "EC cryptography",
   "devDependencies": {
     "brfs": "^2.0.2",
@@ -25286,6 +25285,7 @@ module.exports = RIPEMD160
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isValidXAddress = exports.decodeXAddress = exports.xAddressToClassicAddress = exports.encodeXAddress = exports.classicAddressToXAddress = exports.isValidClassicAddress = exports.decodeAccountPublic = exports.encodeAccountPublic = exports.decodeNodePublic = exports.encodeNodePublic = exports.decodeAccountID = exports.encodeAccountID = exports.decodeSeed = exports.encodeSeed = exports.codec = void 0;
+const assert = require("assert");
 const xrp_codec_1 = require("./xrp-codec");
 Object.defineProperty(exports, "codec", { enumerable: true, get: function () { return xrp_codec_1.codec; } });
 Object.defineProperty(exports, "encodeSeed", { enumerable: true, get: function () { return xrp_codec_1.encodeSeed; } });
@@ -25297,13 +25297,15 @@ Object.defineProperty(exports, "decodeNodePublic", { enumerable: true, get: func
 Object.defineProperty(exports, "encodeAccountPublic", { enumerable: true, get: function () { return xrp_codec_1.encodeAccountPublic; } });
 Object.defineProperty(exports, "decodeAccountPublic", { enumerable: true, get: function () { return xrp_codec_1.decodeAccountPublic; } });
 Object.defineProperty(exports, "isValidClassicAddress", { enumerable: true, get: function () { return xrp_codec_1.isValidClassicAddress; } });
-const assert = require("assert");
 const PREFIX_BYTES = {
-    MAIN: Buffer.from([0x05, 0x44]),
-    TEST: Buffer.from([0x04, 0x93]) // 4, 147
+    // 5, 68
+    main: Buffer.from([0x05, 0x44]),
+    // 4, 147
+    test: Buffer.from([0x04, 0x93]),
 };
+const MAX_32_BIT_UNSIGNED_INT = 4294967295;
 function classicAddressToXAddress(classicAddress, tag, test) {
-    const accountId = xrp_codec_1.decodeAccountID(classicAddress);
+    const accountId = (0, xrp_codec_1.decodeAccountID)(classicAddress);
     return encodeXAddress(accountId, tag, test);
 }
 exports.classicAddressToXAddress = classicAddressToXAddress;
@@ -25312,63 +25314,78 @@ function encodeXAddress(accountId, tag, test) {
         // RIPEMD160 is 160 bits = 20 bytes
         throw new Error('Account ID must be 20 bytes');
     }
-    const MAX_32_BIT_UNSIGNED_INT = 4294967295;
-    const flag = tag === false ? 0 : tag <= MAX_32_BIT_UNSIGNED_INT ? 1 : 2;
-    if (flag === 2) {
+    if (tag > MAX_32_BIT_UNSIGNED_INT) {
         throw new Error('Invalid tag');
     }
-    if (tag === false) {
-        tag = 0;
-    }
+    const theTag = tag || 0;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- Passing null is a common js mistake
+    const flag = tag === false || tag == null ? 0 : 1;
+    /* eslint-disable no-bitwise ---
+     * need to use bitwise operations here */
     const bytes = Buffer.concat([
-        test ? PREFIX_BYTES.TEST : PREFIX_BYTES.MAIN,
+        test ? PREFIX_BYTES.test : PREFIX_BYTES.main,
         accountId,
         Buffer.from([
+            // 0x00 if no tag, 0x01 if 32-bit tag
             flag,
-            tag & 0xff,
-            (tag >> 8) & 0xff,
-            (tag >> 16) & 0xff,
-            (tag >> 24) & 0xff,
-            0, 0, 0, 0 // four zero bytes (reserved for 64-bit tags)
-        ])
+            // first byte
+            theTag & 0xff,
+            // second byte
+            (theTag >> 8) & 0xff,
+            // third byte
+            (theTag >> 16) & 0xff,
+            // fourth byte
+            (theTag >> 24) & 0xff,
+            0,
+            0,
+            0,
+            // four zero bytes (reserved for 64-bit tags)
+            0,
+        ]),
     ]);
-    const xAddress = xrp_codec_1.codec.encodeChecked(bytes);
-    return xAddress;
+    /* eslint-enable no-bitwise */
+    return xrp_codec_1.codec.encodeChecked(bytes);
 }
 exports.encodeXAddress = encodeXAddress;
 function xAddressToClassicAddress(xAddress) {
+    /* eslint-disable @typescript-eslint/naming-convention --
+     * TODO 'test' should be something like 'isTest', do this later
+     */
     const { accountId, tag, test } = decodeXAddress(xAddress);
-    const classicAddress = xrp_codec_1.encodeAccountID(accountId);
+    /* eslint-enable @typescript-eslint/naming-convention */
+    const classicAddress = (0, xrp_codec_1.encodeAccountID)(accountId);
     return {
         classicAddress,
         tag,
-        test
+        test,
     };
 }
 exports.xAddressToClassicAddress = xAddressToClassicAddress;
 function decodeXAddress(xAddress) {
     const decoded = xrp_codec_1.codec.decodeChecked(xAddress);
+    /* eslint-disable @typescript-eslint/naming-convention --
+     * TODO 'test' should be something like 'isTest', do this later
+     */
     const test = isBufferForTestAddress(decoded);
+    /* eslint-enable @typescript-eslint/naming-convention */
     const accountId = decoded.slice(2, 22);
     const tag = tagFromBuffer(decoded);
     return {
         accountId,
         tag,
-        test
+        test,
     };
 }
 exports.decodeXAddress = decodeXAddress;
 function isBufferForTestAddress(buf) {
     const decodedPrefix = buf.slice(0, 2);
-    if (PREFIX_BYTES.MAIN.equals(decodedPrefix)) {
+    if (PREFIX_BYTES.main.equals(decodedPrefix)) {
         return false;
     }
-    else if (PREFIX_BYTES.TEST.equals(decodedPrefix)) {
+    if (PREFIX_BYTES.test.equals(decodedPrefix)) {
         return true;
     }
-    else {
-        throw new Error('Invalid X-address: bad prefix');
-    }
+    throw new Error('Invalid X-address: bad prefix');
 }
 function tagFromBuffer(buf) {
     const flag = buf[22];
@@ -25388,7 +25405,7 @@ function isValidXAddress(xAddress) {
     try {
         decodeXAddress(xAddress);
     }
-    catch (e) {
+    catch (_error) {
         return false;
     }
     return true;
@@ -25401,10 +25418,10 @@ exports.isValidXAddress = isValidXAddress;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.concatArgs = exports.seqEqual = void 0;
 /**
- * Check whether two sequences (e.g. arrays of numbers) are equal.
+ * Check whether two sequences (e.g. Arrays of numbers) are equal.
  *
- * @param arr1 One of the arrays to compare.
- * @param arr2 The other array to compare.
+ * @param arr1 - One of the arrays to compare.
+ * @param arr2 - The other array to compare.
  */
 function seqEqual(arr1, arr2) {
     if (arr1.length !== arr2.length) {
@@ -25419,29 +25436,30 @@ function seqEqual(arr1, arr2) {
 }
 exports.seqEqual = seqEqual;
 /**
- * Check whether a value is a sequence (e.g. array of numbers).
+ * Check whether a value is a sequence (e.g. Array of numbers).
  *
- * @param val The value to check.
+ * @param val - The value to check.
  */
 function isSequence(val) {
-    return val.length !== undefined;
+    return typeof val !== 'number';
 }
 /**
-* Concatenate all `arguments` into a single array. Each argument can be either
-* a single element or a sequence, which has a `length` property and supports
-* element retrieval via sequence[ix].
-*
-* > concatArgs(1, [2, 3], Buffer.from([4,5]), new Uint8Array([6, 7]));
-*  [1,2,3,4,5,6,7]
-*
-* @returns {number[]} Array of concatenated arguments
-*/
+ * Concatenate all `arguments` into a single array. Each argument can be either
+ * a single element or a sequence, which has a `length` property and supports
+ * element retrieval via sequence[ix].
+ *
+ * > concatArgs(1, [2, 3], Buffer.from([4,5]), new Uint8Array([6, 7]));
+ * [1,2,3,4,5,6,7]
+ *
+ * @param args - Concatenate of these args into a single array.
+ * @returns Array of concatenated arguments
+ */
 function concatArgs(...args) {
     const ret = [];
-    args.forEach(function (arg) {
+    args.forEach((arg) => {
         if (isSequence(arg)) {
-            for (let j = 0; j < arg.length; j++) {
-                ret.push(arg[j]);
+            for (const j of arg) {
+                ret.push(j);
             }
         }
         else {
@@ -25461,45 +25479,34 @@ exports.concatArgs = concatArgs;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isValidClassicAddress = exports.decodeAccountPublic = exports.encodeAccountPublic = exports.encodeNodePublic = exports.decodeNodePublic = exports.decodeAddress = exports.decodeAccountID = exports.encodeAddress = exports.encodeAccountID = exports.decodeSeed = exports.encodeSeed = exports.codec = void 0;
 const baseCodec = require("base-x");
+const createHash = require("create-hash");
 const utils_1 = require("./utils");
 class Codec {
     constructor(options) {
-        this.sha256 = options.sha256;
-        this.alphabet = options.alphabet;
-        this.codec = baseCodec(this.alphabet);
-        this.base = this.alphabet.length;
+        this._sha256 = options.sha256;
+        this._alphabet = options.alphabet;
+        this._codec = baseCodec(this._alphabet);
     }
     /**
      * Encoder.
      *
-     * @param bytes Buffer of data to encode.
-     * @param opts Options object including the version bytes and the expected length of the data to encode.
+     * @param bytes - Buffer of data to encode.
+     * @param opts - Options object including the version bytes and the expected length of the data to encode.
      */
     encode(bytes, opts) {
         const versions = opts.versions;
-        return this.encodeVersioned(bytes, versions, opts.expectedLength);
-    }
-    encodeVersioned(bytes, versions, expectedLength) {
-        if (expectedLength && bytes.length !== expectedLength) {
-            throw new Error('unexpected_payload_length: bytes.length does not match expectedLength.' +
-                ' Ensure that the bytes are a Buffer.');
-        }
-        return this.encodeChecked(Buffer.from(utils_1.concatArgs(versions, bytes)));
-    }
-    encodeChecked(buffer) {
-        const check = this.sha256(this.sha256(buffer)).slice(0, 4);
-        return this.encodeRaw(Buffer.from(utils_1.concatArgs(buffer, check)));
-    }
-    encodeRaw(bytes) {
-        return this.codec.encode(bytes);
+        return this._encodeVersioned(bytes, versions, opts.expectedLength);
     }
     /**
      * Decoder.
      *
-     * @param base58string Base58Check-encoded string to decode.
-     * @param opts Options object including the version byte(s) and the expected length of the data after decoding.
+     * @param base58string - Base58Check-encoded string to decode.
+     * @param opts - Options object including the version byte(s) and the expected length of the data after decoding.
      */
+    /* eslint-disable max-lines-per-function --
+     * TODO refactor */
     decode(base58string, opts) {
+        var _a;
         const versions = opts.versions;
         const types = opts.versionTypes;
         const withoutSum = this.decodeChecked(base58string);
@@ -25507,56 +25514,79 @@ class Codec {
             throw new Error('expectedLength is required because there are >= 2 possible versions');
         }
         const versionLengthGuess = typeof versions[0] === 'number' ? 1 : versions[0].length;
-        const payloadLength = opts.expectedLength || withoutSum.length - versionLengthGuess;
+        const payloadLength = (_a = opts.expectedLength) !== null && _a !== void 0 ? _a : withoutSum.length - versionLengthGuess;
         const versionBytes = withoutSum.slice(0, -payloadLength);
         const payload = withoutSum.slice(-payloadLength);
         for (let i = 0; i < versions.length; i++) {
-            const version = Array.isArray(versions[i]) ? versions[i] : [versions[i]];
-            if (utils_1.seqEqual(versionBytes, version)) {
+            /* eslint-disable @typescript-eslint/consistent-type-assertions --
+             * TODO refactor */
+            const version = Array.isArray(versions[i])
+                ? versions[i]
+                : [versions[i]];
+            if ((0, utils_1.seqEqual)(versionBytes, version)) {
                 return {
                     version,
                     bytes: payload,
-                    type: types ? types[i] : null
+                    type: types ? types[i] : null,
                 };
             }
+            /* eslint-enable @typescript-eslint/consistent-type-assertions */
         }
         throw new Error('version_invalid: version bytes do not match any of the provided version(s)');
     }
+    encodeChecked(buffer) {
+        const check = this._sha256(this._sha256(buffer)).slice(0, 4);
+        return this._encodeRaw(Buffer.from((0, utils_1.concatArgs)(buffer, check)));
+    }
     decodeChecked(base58string) {
-        const buffer = this.decodeRaw(base58string);
+        const buffer = this._decodeRaw(base58string);
         if (buffer.length < 5) {
             throw new Error('invalid_input_size: decoded data must have length >= 5');
         }
-        if (!this.verifyCheckSum(buffer)) {
+        if (!this._verifyCheckSum(buffer)) {
             throw new Error('checksum_invalid');
         }
         return buffer.slice(0, -4);
     }
-    decodeRaw(base58string) {
-        return this.codec.decode(base58string);
+    _encodeVersioned(bytes, versions, expectedLength) {
+        if (expectedLength && bytes.length !== expectedLength) {
+            throw new Error('unexpected_payload_length: bytes.length does not match expectedLength.' +
+                ' Ensure that the bytes are a Buffer.');
+        }
+        return this.encodeChecked(Buffer.from((0, utils_1.concatArgs)(versions, bytes)));
     }
-    verifyCheckSum(bytes) {
-        const computed = this.sha256(this.sha256(bytes.slice(0, -4))).slice(0, 4);
+    _encodeRaw(bytes) {
+        return this._codec.encode(bytes);
+    }
+    /* eslint-enable max-lines-per-function */
+    _decodeRaw(base58string) {
+        return this._codec.decode(base58string);
+    }
+    _verifyCheckSum(bytes) {
+        const computed = this._sha256(this._sha256(bytes.slice(0, -4))).slice(0, 4);
         const checksum = bytes.slice(-4);
-        return utils_1.seqEqual(computed, checksum);
+        return (0, utils_1.seqEqual)(computed, checksum);
     }
 }
 /**
  * XRP codec
  */
-// Pure JavaScript hash functions in the browser, native hash functions in Node.js
-const createHash = require('create-hash');
 // base58 encodings: https://xrpl.org/base58-encodings.html
-const ACCOUNT_ID = 0; // Account address (20 bytes)
-const ACCOUNT_PUBLIC_KEY = 0x23; // Account public key (33 bytes)
-const FAMILY_SEED = 0x21; // 33; Seed value (for secret keys) (16 bytes)
-const NODE_PUBLIC = 0x1C; // 28; Validation public key (33 bytes)
-const ED25519_SEED = [0x01, 0xE1, 0x4B]; // [1, 225, 75]
+// Account address (20 bytes)
+const ACCOUNT_ID = 0;
+// Account public key (33 bytes)
+const ACCOUNT_PUBLIC_KEY = 0x23;
+// 33; Seed value (for secret keys) (16 bytes)
+const FAMILY_SEED = 0x21;
+// 28; Validation public key (33 bytes)
+const NODE_PUBLIC = 0x1c;
+// [1, 225, 75]
+const ED25519_SEED = [0x01, 0xe1, 0x4b];
 const codecOptions = {
-    sha256: function (bytes) {
+    sha256(bytes) {
         return createHash('sha256').update(Buffer.from(bytes)).digest();
     },
-    alphabet: 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz'
+    alphabet: 'rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1tuvAxyz',
 };
 const codecWithXrpAlphabet = new Codec(codecOptions);
 exports.codec = codecWithXrpAlphabet;
@@ -25569,7 +25599,7 @@ function encodeSeed(entropy, type) {
     const opts = {
         expectedLength: 16,
         // for secp256k1, use `FAMILY_SEED`
-        versions: type === 'ed25519' ? ED25519_SEED : [FAMILY_SEED]
+        versions: type === 'ed25519' ? ED25519_SEED : [FAMILY_SEED],
     };
     // prefixes entropy with version bytes
     return codecWithXrpAlphabet.encode(entropy, opts);
@@ -25578,7 +25608,7 @@ exports.encodeSeed = encodeSeed;
 function decodeSeed(seed, opts = {
     versionTypes: ['ed25519', 'secp256k1'],
     versions: [ED25519_SEED, FAMILY_SEED],
-    expectedLength: 16
+    expectedLength: 16,
 }) {
     return codecWithXrpAlphabet.decode(seed, opts);
 }
@@ -25588,13 +25618,21 @@ function encodeAccountID(bytes) {
     return codecWithXrpAlphabet.encode(bytes, opts);
 }
 exports.encodeAccountID = encodeAccountID;
+/* eslint-disable import/no-unused-modules ---
+ * unclear why this is aliased but we should keep it in case someone else is
+ * importing it with the aliased name */
 exports.encodeAddress = encodeAccountID;
+/* eslint-enable import/no-unused-modules */
 function decodeAccountID(accountId) {
     const opts = { versions: [ACCOUNT_ID], expectedLength: 20 };
     return codecWithXrpAlphabet.decode(accountId, opts).bytes;
 }
 exports.decodeAccountID = decodeAccountID;
+/* eslint-disable import/no-unused-modules ---
+ * unclear why this is aliased but we should keep it in case someone else is
+ * importing it with the aliased name */
 exports.decodeAddress = decodeAccountID;
+/* eslint-enable import/no-unused-modules */
 function decodeNodePublic(base58string) {
     const opts = { versions: [NODE_PUBLIC], expectedLength: 33 };
     return codecWithXrpAlphabet.decode(base58string, opts).bytes;
@@ -25619,7 +25657,7 @@ function isValidClassicAddress(address) {
     try {
         decodeAccountID(address);
     }
-    catch (e) {
+    catch (_error) {
         return false;
     }
     return true;
@@ -25628,6 +25666,41 @@ exports.isValidClassicAddress = isValidClassicAddress;
 
 }).call(this)}).call(this,require("buffer").Buffer)
 },{"./utils":91,"base-x":6,"buffer":11,"create-hash":14}],93:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+/* eslint-disable no-bitwise --
+ * lots of bitwise operators necessary for this */
+const hashjs = require("hash.js");
+const BigNum = require("bn.js");
+class Sha512 {
+    constructor() {
+        this.hash = hashjs.sha512();
+    }
+    add(bytes) {
+        this.hash.update(bytes);
+        return this;
+    }
+    addU32(i) {
+        return this.add([
+            (i >>> 24) & 0xff,
+            (i >>> 16) & 0xff,
+            (i >>> 8) & 0xff,
+            i & 0xff,
+        ]);
+    }
+    finish() {
+        return this.hash.digest();
+    }
+    first256() {
+        return this.finish().slice(0, 32);
+    }
+    first256BN() {
+        return new BigNum(this.first256());
+    }
+}
+exports.default = Sha512;
+
+},{"bn.js":8,"hash.js":50}],94:[function(require,module,exports){
 (function (Buffer){(function (){
 "use strict";
 const assert = require("assert");
@@ -25642,10 +25715,10 @@ const Secp256k1 = elliptic.ec('secp256k1');
 const { hexToBytes } = utils;
 const { bytesToHex } = utils;
 function generateSeed(options = {}) {
-    assert(!options.entropy || options.entropy.length >= 16, 'entropy too short');
+    assert.ok(!options.entropy || options.entropy.length >= 16, 'entropy too short');
     const entropy = options.entropy ? options.entropy.slice(0, 16) : brorand(16);
     const type = options.algorithm === 'ed25519' ? 'ed25519' : 'secp256k1';
-    return addressCodec.encodeSeed(entropy, type);
+    return addressCodec.encodeSeed(Buffer.from(entropy), type);
 }
 function hash(message) {
     return hashjs.sha512().update(message).digest().slice(0, 32);
@@ -25653,7 +25726,7 @@ function hash(message) {
 const secp256k1 = {
     deriveKeypair(entropy, options) {
         const prefix = '00';
-        const privateKey = prefix + secp256k1_1.derivePrivateKey(entropy, options).toString(16, 64).toUpperCase();
+        const privateKey = prefix + (0, secp256k1_1.derivePrivateKey)(entropy, options).toString(16, 64).toUpperCase();
         const publicKey = bytesToHex(Secp256k1.keyFromPrivate(privateKey.slice(2))
             .getPublic()
             .encodeCompressed());
@@ -25679,14 +25752,13 @@ const ed25519 = {
     sign(message, privateKey) {
         // caution: Ed25519.sign interprets all strings as hex, stripping
         // any non-hex characters without warning
-        assert(Array.isArray(message), 'message must be array of octets');
+        assert.ok(Array.isArray(message), 'message must be array of octets');
         return bytesToHex(Ed25519.sign(message, hexToBytes(privateKey).slice(1)).toBytes());
     },
     verify(message, signature, publicKey) {
         return Ed25519.verify(message, hexToBytes(signature), hexToBytes(publicKey).slice(1));
     },
 };
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function select(algorithm) {
     const methods = { 'ecdsa-secp256k1': secp256k1, ed25519 };
     return methods[algorithm];
@@ -25726,7 +25798,7 @@ function deriveAddress(publicKey) {
 }
 function deriveNodeAddress(publicKey) {
     const generatorBytes = addressCodec.decodeNodePublic(publicKey);
-    const accountPublicBytes = secp256k1_1.accountPublicFromPublicGenerator(generatorBytes);
+    const accountPublicBytes = (0, secp256k1_1.accountPublicFromPublicGenerator)(generatorBytes);
     return deriveAddressFromBytes(accountPublicBytes);
 }
 const { decodeSeed } = addressCodec;
@@ -25741,20 +25813,19 @@ module.exports = {
 };
 
 }).call(this)}).call(this,require("buffer").Buffer)
-},{"./secp256k1":94,"./utils":96,"assert":2,"brorand":9,"buffer":11,"elliptic":15,"hash.js":50,"ripple-address-codec":90}],94:[function(require,module,exports){
+},{"./secp256k1":95,"./utils":96,"assert":2,"brorand":9,"buffer":11,"elliptic":15,"hash.js":50,"ripple-address-codec":90}],95:[function(require,module,exports){
 "use strict";
-/* eslint-disable */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.accountPublicFromPublicGenerator = exports.derivePrivateKey = void 0;
 const elliptic = require("elliptic");
-const sha512_1 = require("./sha512");
+const Sha512_1 = require("./Sha512");
 const secp256k1 = elliptic.ec('secp256k1');
 function deriveScalar(bytes, discrim) {
     const order = secp256k1.curve.n;
     for (let i = 0; i <= 0xffffffff; i++) {
         // We hash the bytes to find a 256 bit number, looping until we are sure it
         // is less than the order of the curve.
-        const hasher = new sha512_1.default().add(bytes);
+        const hasher = new Sha512_1.default().add(bytes);
         // If the optional discriminator index was passed in, update the hash.
         if (discrim !== undefined) {
             hasher.addU32(discrim);
@@ -25766,24 +25837,24 @@ function deriveScalar(bytes, discrim) {
             return key;
         }
     }
-    /* This error is practically impossible to reach.
-     * The order of the curve describes the (finite) amount of points on the curve
-     * https://github.com/indutny/elliptic/blob/master/lib/elliptic/curves.js#L182
-     * How often will an (essentially) random number generated by Sha512 be larger than that?
-     * There's 2^32 chances (the for loop) to get a number smaller than the order,
-     * and it's rare that you'll even get past the first loop iteration.
-     * Note that in TypeScript we actually need the throw, otherwise the function signature would be BN | undefined
-     */
+    // This error is practically impossible to reach.
+    // The order of the curve describes the (finite) amount of points on the curve
+    // https://github.com/indutny/elliptic/blob/master/lib/elliptic/curves.js#L182
+    // How often will an (essentially) random number generated by Sha512 be larger than that?
+    // There's 2^32 chances (the for loop) to get a number smaller than the order,
+    // and it's rare that you'll even get past the first loop iteration.
+    // Note that in TypeScript we actually need the throw, otherwise the function signature would be BN | undefined
+    //
     /* istanbul ignore next */
     throw new Error('impossible unicorn ;)');
 }
 /**
- * @param {Array} seed - bytes
- * @param {Object} [opts] - object
- * @param {Number} [opts.accountIndex=0] - the account number to generate
- * @param {Boolean} [opts.validator=false] - generate root key-pair,
+ * @param seed - Bytes.
+ * @param [opts] - Object.
+ * @param [opts.accountIndex=0] - The account number to generate.
+ * @param [opts.validator=false] - Generate root key-pair,
  *                                              as used by validators.
- * @return {bn.js} - 256 bit scalar value
+ * @returns {bn.js} 256 bit scalar value.
  *
  */
 function derivePrivateKey(seed, opts = {}) {
@@ -25814,41 +25885,7 @@ function accountPublicFromPublicGenerator(publicGenBytes) {
 }
 exports.accountPublicFromPublicGenerator = accountPublicFromPublicGenerator;
 
-},{"./sha512":95,"elliptic":15}],95:[function(require,module,exports){
-"use strict";
-/* eslint-disable */
-Object.defineProperty(exports, "__esModule", { value: true });
-const hashjs = require("hash.js");
-const BigNum = require("bn.js");
-class Sha512 {
-    constructor() {
-        this.hash = hashjs.sha512();
-    }
-    add(bytes) {
-        this.hash.update(bytes);
-        return this;
-    }
-    addU32(i) {
-        return this.add([
-            (i >>> 24) & 0xff,
-            (i >>> 16) & 0xff,
-            (i >>> 8) & 0xff,
-            i & 0xff,
-        ]);
-    }
-    finish() {
-        return this.hash.digest();
-    }
-    first256() {
-        return this.finish().slice(0, 32);
-    }
-    first256BN() {
-        return new BigNum(this.first256());
-    }
-}
-exports.default = Sha512;
-
-},{"bn.js":8,"hash.js":50}],96:[function(require,module,exports){
+},{"./Sha512":93,"elliptic":15}],96:[function(require,module,exports){
 (function (Buffer){(function (){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -25857,17 +25894,18 @@ const assert = require("assert");
 const hashjs = require("hash.js");
 const BN = require("bn.js");
 function bytesToHex(a) {
-    return a
-        .map((byteValue) => {
+    return Array.from(a, (byteValue) => {
         const hex = byteValue.toString(16).toUpperCase();
         return hex.length > 1 ? hex : `0${hex}`;
-    })
-        .join('');
+    }).join('');
 }
 exports.bytesToHex = bytesToHex;
 function hexToBytes(a) {
-    assert(a.length % 2 === 0);
-    return new BN(a, 16).toArray(null, a.length / 2);
+    assert.ok(a.length % 2 === 0);
+    // Special-case length zero to return [].
+    // BN.toArray intentionally returns [0] rather than [] for length zero,
+    // which may make sense for BigNum data, but not for byte strings.
+    return a.length === 0 ? [] : new BN(a, 16).toArray(null, a.length / 2);
 }
 exports.hexToBytes = hexToBytes;
 function computePublicKeyHash(publicKeyBytes) {
