@@ -1,30 +1,39 @@
 # About
-- https://github.com/yuki777/xrp-paper-wallet
-- Ripple XRP paper wallet generator.
-- Working offline.
+- This is a Ripple XRP paper wallet generator.
+- It works offline.
 
-# Install and Build
-```
-# Install
+# Installation and Building
+- Follow these steps to install and build the generator:
+```bash
+# Clone the repository
 git clone https://github.com/yuki777/xrp-paper-wallet xrp-paper-wallet
 cd xrp-paper-wallet
+
+# Install dependencies
 npm install
 
-# Build
-npm run-script build
-
-# Disable internet access
-- Turn off the Wi-Fi.
-- Disconnect the Ethernet cable.
-
+# Build the application
+npm run build
 ```
 
-# Create XRP Address via Browser
-```
-open index.html # Don't forget to save it.
+- We recommend disabling your internet connection to increase security:
+```bash
+# Disconnect from the internet (Recommended)
+- Turn off your Wi-Fi.
+- Disconnect your Ethernet cable.
+- Just for good measure, look over your shoulder too. You never know.
 ```
 
-# Create XRP Address via CLI
+# Generating an XRP Address Through a Browser
+- To create an XRP address through your browser, open the index.html file:
+```bash
+open index.html # Don't forget to save your generated address.
 ```
-node create.js # Don't forget to save it.
+
+# Generating an XRP Address via the Command Line Interface (CLI)
+- To create an XRP address using the CLI, execute the following command:
+```bash
+node create.js # Don't forget to save your generated address.
 ```
+
+Remember, it's essential to keep your generated addresses safe. Enjoy using the XRP paper wallet generator!
