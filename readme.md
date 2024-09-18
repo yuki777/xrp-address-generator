@@ -6,8 +6,8 @@
 - Follow these steps to install and build the generator:
 ```bash
 # Clone the repository
-git clone https://github.com/yuki777/xrp-paper-wallet xrp-paper-wallet
-cd xrp-paper-wallet
+git clone https://github.com/yuki777/xrp-address-generator xrp-address-generator
+cd xrp-address-generator
 
 # Install dependencies
 npm ci
