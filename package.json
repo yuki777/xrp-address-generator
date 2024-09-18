@@ -1,10 +1,10 @@
 {
-  "name": "xrp-paper-wallet",
+  "name": "xrp-address-generator",
   "version": "2.0.0",
-  "description": "XRP paper wallet generator",
+  "description": "XRP address generator",
   "repository": {
     "type": "git",
-    "url": "git://github.com/yuki777/xrp-paper-wallet.git"
+    "url": "git://github.com/yuki777/xrp-address-generator.git"
   },
   "main": "src/main.js",
   "dependencies": {
