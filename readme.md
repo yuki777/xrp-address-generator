@@ -10,10 +10,7 @@ git clone https://github.com/yuki777/xrp-paper-wallet xrp-paper-wallet
 cd xrp-paper-wallet
 
 # Install dependencies
-npm install
-
-# Build the application
-npm run build
+npm ci
 ```
 
 - We recommend disabling your internet connection to increase security:
@@ -21,13 +18,6 @@ npm run build
 # Disconnect from the internet (Recommended)
 - Turn off your Wi-Fi.
 - Disconnect your Ethernet cable.
-- Just for good measure, look over your shoulder too. You never know.
-```
-
-# Generating an XRP Address Through a Browser
-- To create an XRP address through your browser, open the index.html file:
-```bash
-open index.html # Don't forget to save your generated address.
 ```
 
 # Generating an XRP Address via the Command Line Interface (CLI)
